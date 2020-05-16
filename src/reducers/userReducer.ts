@@ -1,19 +1,31 @@
-import { GET_USERS, GET_USER, ADD_USER, EDIT_USER, DELETE_USER } from '../actions/types';
+import { SET_LOADING, GET_USERS, GET_USER, ADD_USER, EDIT_USER, DELETE_USER } from '../actions/types';
 import { User } from '../components/GridBody';
 
+export interface State {
+  items: User[];
+  item: User;
+  isLoading: boolean;
+}
+
 interface UserAction {
-  type: typeof GET_USERS | typeof GET_USER | typeof ADD_USER | typeof EDIT_USER | typeof DELETE_USER,
+  type: typeof SET_LOADING | typeof GET_USERS | typeof GET_USER | typeof ADD_USER | typeof EDIT_USER | typeof DELETE_USER,
   payload: any,
 }
 
 const emptyItem: User = { name: '', username: '', email: '', city: '' };
-const initialState: { items: User[], item: User, redirect: string } = {
+const initialState: State = {
   items: [],
   item: emptyItem,
+  isLoading: false,
 }
 
 export default function (state = initialState, action: UserAction) {
   switch (action.type) {
+    case SET_LOADING:
+      return {
+        ...state,
+        isLoading: action.payload
+      }
     case GET_USERS:
       return {
         ...state,

@@ -1,41 +1,45 @@
 import axios from 'axios';
 import { Dispatch } from 'redux';
 
-import { GET_USERS, GET_USER, ADD_USER, EDIT_USER, DELETE_USER } from './types';
+import { SET_LOADING, GET_USERS, GET_USER, ADD_USER, EDIT_USER, DELETE_USER } from './types';
 import { User } from '../components/GridBody';
 
+const normalizeResult = (e: any): User => {
+  return {
+    id: e.id,
+    name: e.name,
+    username: e.username,
+    email: e.email,
+    city: e.address.city,
+  }
+}
+
 export const getUsers = () => (dispatch: Dispatch) => {
+  dispatch({ type: SET_LOADING, payload: true });
   axios.get('https://my-json-server.typicode.com/karolkproexe/jsonplaceholderdb/data')
     .then(result =>
       dispatch({
         type: GET_USERS,
-        payload: result.data.map((e: any) => {
-          return {
-            id: e.id,
-            name: e.name,
-            username: e.username,
-            email: e.email,
-            city: e.address.city,
-          }
-        })
+        payload: result.data.map((e: any) => normalizeResult(e))
       }))
-    .catch(err => console.log('No deal...', err));
+    .catch(err => console.log('No deal...', err))
+    .finally(() => {
+      dispatch({ type: SET_LOADING, payload: false });
+    });
 };
 
 export const getUser = (id: number) => (dispatch: Dispatch) => {
+  dispatch({ type: SET_LOADING, payload: true });
   axios.get(`https://my-json-server.typicode.com/karolkproexe/jsonplaceholderdb/data/${id}`)
     .then(result =>
       dispatch({
         type: GET_USER,
-        payload: {
-          id: result.data.id,
-          name: result.data.name,
-          username: result.data.username,
-          email: result.data.email,
-          city: result.data.address.city,
-        }
+        payload: normalizeResult(result.data)
       }))
-    .catch(err => console.log('No deal...', err));
+    .catch(err => console.log('No deal...', err))
+    .finally(() => {
+      dispatch({ type: SET_LOADING, payload: false });
+    });
 };
 
 export const addUser = (userData: User) => (dispatch: Dispatch) => {
@@ -50,13 +54,7 @@ export const addUser = (userData: User) => (dispatch: Dispatch) => {
     .then(result =>
       dispatch({
         type: ADD_USER,
-        payload: {
-          id: result.data.id,
-          name: result.data.name,
-          username: result.data.username,
-          email: result.data.email,
-          city: result.data.address.city,
-        }
+        payload: normalizeResult(result.data)
       }))
     .catch(err => console.log('No deal...', err));
 };
@@ -73,13 +71,7 @@ export const editUser = (userData: User) => (dispatch: Dispatch) => {
     .then(result =>
       dispatch({
         type: EDIT_USER,
-        payload: {
-          id: result.data.id,
-          name: result.data.name,
-          username: result.data.username,
-          email: result.data.email,
-          city: result.data.address.city,
-        }
+        payload: normalizeResult(result.data)
       }))
     .catch(err => console.log('No deal...', err));
 };
@@ -87,7 +79,7 @@ export const editUser = (userData: User) => (dispatch: Dispatch) => {
 export const deleteUser = (id: number) => (dispatch: Dispatch) => {
   axios
     .delete(`https://my-json-server.typicode.com/karolkproexe/jsonplaceholderdb/data/${id}`)
-    .then(result =>
+    .then(() =>
       dispatch({
         type: DELETE_USER,
         payload: id

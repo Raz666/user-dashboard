@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Alert } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 
 import { connect } from 'react-redux';
@@ -17,35 +17,51 @@ interface Props {
 
 interface State extends User {
   redirect: string;
+  message?: string;
 }
 
 class UserForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = props.user
-      ? { ...props.user, redirect: '' }
+      ? { ...props.user, redirect: '', message: '' }
       : {
         name: '',
         username: '',
         email: '',
         city: '',
         redirect: '',
+        message: '',
       };
   };
 
   onSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
-    this.setState({ redirect: '/' });
-    this.state.id ? this.props.editUser(this.state) : this.props.addUser(this.state);
+    if (this.validateForm()) {
+      this.setState({ redirect: '/' });
+      this.state.id ? this.props.editUser(this.state) : this.props.addUser(this.state);
+    } else {
+      this.setState({ message: 'Fill all the fields, please!' });
+    }
   }
 
   updateStateValue = (name: any, value: string): void => {
+    this.setState({ message: '' });
     this.setState({ [name]: value } as Pick<User, keyof User>);
   }
 
+  validateForm = (): boolean => {
+    for (let i of Object.entries(this.state)) {
+      if (i[0] === 'redirect') continue;
+      if (i[0] === 'message') continue;
+      if (i[1] === '') return false;
+    }
+    return true;
+  }
+
   render() {
-    const { name, email, username, city, redirect } = this.state;
+    const { name, email, username, city, redirect, message } = this.state;
 
     if (redirect) {
       return <Redirect to={redirect} />
@@ -80,8 +96,13 @@ class UserForm extends React.Component<Props, State> {
           placeholder={'e.g. Gotham'}
           onChange={this.updateStateValue}
         />
-        <Button type="submit" variant="success" className="float-right">Submit</Button>
-        <Button variant="outline-danger" onClick={() => this.setState({ redirect: '/' })} className="float-right mr-3">Cancel</Button>
+        <div className="clearfix">
+          <Button type="submit" variant="success" className="float-right">Submit</Button>
+          <Button variant="outline-danger" onClick={() => this.setState({ redirect: '/' })} className="float-right mr-3">Cancel</Button>
+        </div>
+        {message
+          ? <Alert variant="danger" className="float-right mt-3 py-2">{message}</Alert>
+          : ''}
       </Form >
     );
   }

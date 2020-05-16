@@ -6,21 +6,24 @@ import { Card } from 'react-bootstrap';
 import { getUser } from '../actions/userActions';
 import { User } from './GridBody';
 import UserForm from './UserForm';
+import Loader from './Loader';
 
 type TParams = {
   id: string,
 };
 
 interface Props extends RouteComponentProps<TParams> {
-  getUser: (id: number) => void;
   user: User;
+  isLoading: boolean;
+  getUser: (id: number) => void;
 }
 
 const mapStateToProps = (state: any) => ({
-  user: state.users.item
+  user: state.users.item,
+  isLoading: state.users.isLoading,
 });
 
-const UserDetails: React.FC<Props> = ({ match, user, getUser }) => {
+const UserDetails: React.FC<Props> = ({ match, user, isLoading, getUser }) => {
   useEffect(() => {
     if (match.params.id) { getUser(parseInt(match.params.id)); }
   }, [getUser, match]);
@@ -33,9 +36,9 @@ const UserDetails: React.FC<Props> = ({ match, user, getUser }) => {
         </Card.Header>
         <Card.Body>
           {match.params.id
-            ? user && user.id
-              ? <UserForm user={user} />
-              : `Loading...`
+            ? isLoading
+              ? <Loader />
+              : <UserForm user={user} />
             : <UserForm />}
 
         </Card.Body>

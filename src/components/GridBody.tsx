@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-import { getUsers, deleteUser } from '../actions/userActions';
+import { deleteUser } from '../actions/userActions';
 import ConfirmDelete from './ConfirmDelete';
 
 export interface User {
@@ -16,7 +16,6 @@ export interface User {
 
 interface Props {
   users: User[];
-  getUsers: () => void;
   deleteUser: (id: number) => void;
 }
 
@@ -24,7 +23,7 @@ const mapStateToProps = (state: any) => ({
   users: state.users.items
 });
 
-const GridBody: React.FC<Props> = ({ users, getUsers, deleteUser }) => {
+const GridBody: React.FC<Props> = ({ users, deleteUser }) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [userToDelete, setUserRemoval] = useState({ id: -1, name: '' });
 
@@ -58,7 +57,6 @@ const GridBody: React.FC<Props> = ({ users, getUsers, deleteUser }) => {
       </tbody>
     </>
   );
-  // }
 }
 
-export default connect(mapStateToProps, { getUsers, deleteUser })(GridBody);
+export default connect(mapStateToProps, { deleteUser })(GridBody);
