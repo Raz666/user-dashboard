@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 import { Table } from 'react-bootstrap';
 
+import { getUsers } from '../actions/userActions';
 import GridHeader, { Column } from './GridHeader';
-import GridBody from './GridBody';
+import GridBody, { User } from './GridBody';
 
 interface Props {
-  
+  users: User[];
+  getUsers: () => void;
 }
 
-const Grid: React.FC<Props> = () => {
+const mapStateToProps = (state: any) => ({
+  users: state.users.items
+});
+
+
+const Grid: React.FC<Props> = ({ users, getUsers }) => {
   const columns: Column[] = [
     { name: 'Id' },
     { name: 'Name' },
@@ -18,13 +26,20 @@ const Grid: React.FC<Props> = () => {
     { name: 'Edit' },
     { name: 'Delete' },
   ];
+  
+  useEffect(() => {
+    getUsers();
+  }, [getUsers]);
 
+  if(!users || !users.length){
+    return <div>The are no users to show.</div>
+  }
   return (
-    <Table bordered hover>
+    <Table hover>
       <GridHeader columns={columns} />
       <GridBody />
     </Table>
   );
 }
 
-export default Grid;
+export default connect(mapStateToProps, { getUsers })(Grid);

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom';
 
 import { connect } from 'react-redux';
-import { addUser } from '../actions/userActions';
+import { addUser, editUser } from '../actions/userActions';
 
 import { User } from './GridBody';
 import UserFormField from './UserFormField';
@@ -10,32 +11,45 @@ import UserFormField from './UserFormField';
 interface Props {
   user?: User;
   addUser: (user: User) => void;
+  editUser: (user: User) => void;
+  redirect?: string;
 }
 
-class UserForm extends React.Component<Props, User> {
+interface State extends User {
+  redirect: string;
+}
+
+class UserForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = props.user || {
-      name: '',
-      username: '',
-      email: '',
-      city: '',
-    };
+    this.state = props.user
+      ? { ...props.user, redirect: '' }
+      : {
+        name: '',
+        username: '',
+        email: '',
+        city: '',
+        redirect: '',
+      };
   };
 
-  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  onSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
-    this.props.addUser(this.state);
+    this.setState({ redirect: '/' });
+    this.state.id ? this.props.editUser(this.state) : this.props.addUser(this.state);
   }
 
-  updateStateValue = (name: any, value: string) => {
+  updateStateValue = (name: any, value: string): void => {
     this.setState({ [name]: value } as Pick<User, keyof User>);
   }
 
   render() {
-    const { name, email, username, city } = this.state;
+    const { name, email, username, city, redirect } = this.state;
 
+    if (redirect) {
+      return <Redirect to={redirect} />
+    }
     return (
       <Form onSubmit={this.onSubmit}>
         <UserFormField
@@ -67,10 +81,10 @@ class UserForm extends React.Component<Props, User> {
           onChange={this.updateStateValue}
         />
         <Button type="submit" variant="success" className="float-right">Submit</Button>
-        <Button variant="outline-danger" className="float-right mr-3">Cancel</Button>
+        <Button variant="outline-danger" onClick={() => this.setState({ redirect: '/' })} className="float-right mr-3">Cancel</Button>
       </Form >
     );
   }
 }
 
-export default connect(null, { addUser })(UserForm);
+export default connect(null, { addUser, editUser })(UserForm);

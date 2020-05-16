@@ -3,7 +3,6 @@ import { Form, Row, Col } from 'react-bootstrap';
 
 import { User } from './GridBody';
 
-
 interface Props {
   name: keyof User;
   value: string;
@@ -22,7 +21,6 @@ class UserFormField extends React.Component<Props, State> {
   };
 
   validateField = (value: string): void => {
-    console.log(value);
     this.setState({ validationError: value ? '' : 'This field is required' });
   }
 

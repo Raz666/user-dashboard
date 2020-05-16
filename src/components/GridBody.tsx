@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
-import { getUsers } from '../actions/userActions';
+import { getUsers, deleteUser } from '../actions/userActions';
+import ConfirmDelete from './ConfirmDelete';
 
 export interface User {
   id?: number;
@@ -15,21 +17,32 @@ export interface User {
 interface Props {
   users: User[];
   getUsers: () => void;
+  deleteUser: (id: number) => void;
 }
 
 const mapStateToProps = (state: any) => ({
   users: state.users.items
 });
 
-class GridBody extends React.Component<Props> {
-  componentDidMount() {
-    this.props.getUsers();
-  }
+const GridBody: React.FC<Props> = ({ users, getUsers, deleteUser }) => {
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [userToDelete, setUserRemoval] = useState({ id: -1, name: '' });
 
-  render() {
-    return (
+  const handleDeleteUser = (payload: { id: number, name: string }): void => {
+    setUserRemoval(payload);
+    setShowConfirmDelete(true);
+  }
+  const confirmDeleteUser = (id: number): void => {
+    cancelDeleteUser();
+    deleteUser(id);
+  }
+  const cancelDeleteUser = () => setShowConfirmDelete(false);
+
+  return (
+    <>
+      <ConfirmDelete show={showConfirmDelete} handleConfirm={confirmDeleteUser} handleClose={cancelDeleteUser} payload={userToDelete} />
       <tbody>
-        {this.props.users && this.props.users.map(user => {
+        {users && users.map(user => {
           return (
             <tr key={user.id}>
               <td>{user.id}</td>
@@ -37,14 +50,15 @@ class GridBody extends React.Component<Props> {
               <td>{user.username}</td>
               <td>{user.email}</td>
               <td>{user.city}</td>
-              <td><Button variant="warning">Edit</Button></td>
-              <td><Button variant="danger">Delete</Button></td>
+              <td><Link to={`/edit-user/${user.id}`} className="btn btn-warning btn-sm">Edit</Link></td>
+              <td><Button variant="danger" size="sm" onClick={() => !!user.id && handleDeleteUser({ id: user.id, name: user.name })}>Delete</Button></td>
             </tr>
           )
         })}
       </tbody>
-    );
-  }
+    </>
+  );
+  // }
 }
 
-export default connect(mapStateToProps, { getUsers })(GridBody);
+export default connect(mapStateToProps, { getUsers, deleteUser })(GridBody);
