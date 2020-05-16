@@ -5,7 +5,7 @@ import { GET_USERS, ADD_USER } from './types';
 import { User } from '../components/GridBody';
 
 export const getUsers = () => (dispatch: Dispatch) => {
-  axios.get('https://jsonplaceholder.typicode.com/users')
+  axios.get('https://my-json-server.typicode.com/karolkproexe/jsonplaceholderdb/data')
     .then(result =>
       dispatch({
         type: GET_USERS,
@@ -15,14 +15,13 @@ export const getUsers = () => (dispatch: Dispatch) => {
 };
 
 export const addUser = (userData: User) => (dispatch: Dispatch) => {
+  const { name, username, email, city } = userData;
   axios
-    .post('https://jsonplaceholder.typicode.com/users', userData || {
-      name: "Ervin Howell",
-      email: "Shanna@melissa.tv",
-      username: "Antonette",
-      address: {
-        city: "Wisokyburgh",
-      }
+    .post('https://my-json-server.typicode.com/karolkproexe/jsonplaceholderdb/data', {
+      name,
+      username,
+      email,
+      address: { city },
     })
     .then(result =>
       dispatch({

@@ -8,7 +8,7 @@ interface UserAction {
 
 const initialState: { items: User[], item: User } = {
   items: [],
-  item: { name: '', username: '', email: '', address: { city: '' } },
+  item: { name: '', username: '', email: '', city: '' },
 }
 
 export default function (state = initialState, action: UserAction) {

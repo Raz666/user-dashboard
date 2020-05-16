@@ -4,16 +4,12 @@ import { Button } from 'react-bootstrap';
 
 import { getUsers } from '../actions/userActions';
 
-export interface Address {
-  city: string;
-}
-
 export interface User {
   id?: number;
   name: string;
   username: string;
   email: string;
-  address: Address;
+  city: string;
 }
 
 interface Props {
@@ -40,7 +36,7 @@ class GridBody extends React.Component<Props> {
               <td>{user.name}</td>
               <td>{user.username}</td>
               <td>{user.email}</td>
-              <td>{user.address.city}</td>
+              <td>{user.city}</td>
               <td><Button variant="warning">Edit</Button></td>
               <td><Button variant="danger">Delete</Button></td>
             </tr>
